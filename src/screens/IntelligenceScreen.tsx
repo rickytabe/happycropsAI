@@ -4,8 +4,9 @@ import { analyzeCropImage } from '../services/gemini';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
-import { countries } from '../lib/countries';
+import { countries, Country } from '../lib/countries';
 import { ScanningLoader } from '../components/ScanningLoader';
+import { CountrySelector } from '../components/CountrySelector';
 
 interface IntelligenceScreenProps {
   history: AnalysisResult[];
@@ -22,21 +23,6 @@ export const IntelligenceScreen = ({ history, addHistory }: IntelligenceScreenPr
   const [isScanning, setIsScanning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  const [isCountryOpen, setIsCountryOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleOutside = (e: MouseEvent) => {
-       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-         setIsCountryOpen(false);
-       }
-    };
-    if (isCountryOpen) document.addEventListener('mousedown', handleOutside);
-    return () => document.removeEventListener('mousedown', handleOutside);
-  }, [isCountryOpen]);
-
-  const activeCountryData = countries.find(c => c.name === country) || countries[0];
-
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const libraryInputRef = useRef<HTMLInputElement>(null);
 
@@ -136,62 +122,7 @@ export const IntelligenceScreen = ({ history, addHistory }: IntelligenceScreenPr
           
            <div className="flex flex-col gap-2 relative z-50">
              <label className="font-label text-sm uppercase tracking-widest text-on-surface-variant font-bold">Location for Crop Data</label>
-             <div className="relative w-full max-w-sm" ref={dropdownRef}>
-               <button 
-                  onClick={() => setIsCountryOpen(!isCountryOpen)}
-                  className="w-full bg-surface-container-high border border-outline-variant/30 text-white py-3 px-4 rounded-xl font-bold focus:outline-none hover:border-primary/50 transition-colors shadow-lg flex items-center justify-between"
-               >
-                 <div className="flex items-center gap-3 overflow-hidden">
-                   {activeCountryData && (
-                     <img 
-                       src={`https://flagcdn.com/w20/${activeCountryData.code.toLowerCase()}.png`}
-                       srcSet={`https://flagcdn.com/w40/${activeCountryData.code.toLowerCase()}.png 2x`}
-                       width="20"
-                       alt={activeCountryData.name}
-                       className="shadow-sm rounded-[2px] flex-shrink-0"
-                     />
-                   )}
-                   <span className="truncate">{activeCountryData?.name}</span>
-                 </div>
-                 <span className="material-symbols-outlined pointer-events-none text-white/50 flex-shrink-0 ml-3">
-                   {isCountryOpen ? "expand_less" : "expand_more"}
-                 </span>
-               </button>
-
-               <AnimatePresence>
-                 {isCountryOpen && (
-                   <motion.div 
-                     initial={{ opacity: 0, y: -10 }}
-                     animate={{ opacity: 1, y: 0 }}
-                     exit={{ opacity: 0, y: -10 }}
-                     transition={{ duration: 0.15 }}
-                     className="absolute top-full mt-2 left-0 w-full bg-surface-container border border-outline-variant/30 rounded-xl shadow-2xl z-50 overflow-hidden"
-                   >
-                     <div className="max-h-64 overflow-y-auto custom-scrollbar p-2 space-y-1">
-                       {countries.map(c => (
-                         <button
-                           key={c.code}
-                           onClick={() => { setCountry(c.name as Country); setIsCountryOpen(false); }}
-                           className={cn(
-                             "w-full text-left px-3 py-2.5 flex items-center gap-3 rounded-lg transition-colors",
-                             country === c.name ? "bg-primary/10 text-primary font-bold" : "text-white hover:bg-white/5"
-                           )}
-                         >
-                           <img 
-                             src={`https://flagcdn.com/w20/${c.code.toLowerCase()}.png`}
-                             srcSet={`https://flagcdn.com/w40/${c.code.toLowerCase()}.png 2x`}
-                             width="20"
-                             alt={c.code}
-                             className="shadow-sm rounded-[2px] flex-shrink-0"
-                           />
-                           <span className="truncate">{c.name}</span>
-                         </button>
-                       ))}
-                     </div>
-                   </motion.div>
-                 )}
-               </AnimatePresence>
-             </div>
+             <CountrySelector value={country} onChange={setCountry} className="max-w-sm" />
            </div>
         </motion.div>
 
@@ -258,7 +189,12 @@ export const IntelligenceScreen = ({ history, addHistory }: IntelligenceScreenPr
                       <h4 className="font-headline text-xl font-bold text-on-surface truncate pr-2">{scan.disease_name}</h4>
                       <span className="text-xs text-on-surface-variant font-label whitespace-nowrap">{new Date(scan.timestamp).toLocaleDateString()}</span>
                     </div>
-                    <p className="text-sm text-on-surface-variant mb-4 truncate">{scan.country}</p>
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="text-xl">
+                        {countries.find(c => c.name === scan.country)?.flag}
+                      </span>
+                      <p className="text-sm text-on-surface-variant truncate">{scan.country}</p>
+                    </div>
                     <div className="flex items-center gap-2">
                       <div className="h-1.5 flex-grow bg-surface-container-highest rounded-full overflow-hidden">
                         <div className={cn("h-full rounded-full transition-all", bgClass)} style={{ width: `${scan.confidence_score * 100}%` }}></div>

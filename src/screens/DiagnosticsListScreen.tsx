@@ -2,9 +2,14 @@ import { AnalysisResult } from '../types';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import { motion } from 'motion/react';
+import { countries } from '../lib/countries';
 
 export const DiagnosticsListScreen = ({ history }: { history: AnalysisResult[] }) => {
   const navigate = useNavigate();
+
+  const getFlag = (countryName: string) => {
+    return countries.find(c => c.name === countryName)?.flag || "";
+  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -43,10 +48,16 @@ export const DiagnosticsListScreen = ({ history }: { history: AnalysisResult[] }
                  
                  <div className="flex-grow w-full md:w-auto">
                    <div className="flex items-start justify-between mb-1">
-                     <h3 className="font-headline text-2xl font-bold text-white">{scan.disease_name}</h3>
+                     <div className="flex flex-col">
+                       <h3 className="font-headline text-2xl font-bold text-white">{scan.disease_name}</h3>
+                       <div className="flex items-center gap-1.5 text-on-surface-variant font-bold text-xs uppercase tracking-widest mt-0.5">
+                         <span>{getFlag(scan.country)}</span>
+                         <span>{scan.country}</span>
+                       </div>
+                     </div>
                      <span className="text-sm font-bold text-on-surface-variant">{new Date(scan.timestamp).toLocaleDateString()}</span>
                    </div>
-                   <p className="text-sm text-on-surface-variant mb-3">{scan.contextual_insight}</p>
+                   <p className="text-sm text-on-surface-variant mb-3 line-clamp-1">{scan.contextual_insight}</p>
                    <div className="flex items-center gap-3">
                      <span className={cn("text-xs font-bold uppercase tracking-widest px-2 py-1 rounded bg-surface/50 border border-white/10 flex items-center gap-1", iconColor)}>
                        <span className="material-symbols-outlined text-[14px]">{iconName}</span>

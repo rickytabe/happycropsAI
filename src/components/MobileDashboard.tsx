@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { AnalysisResult } from "../types";
 import { cn } from "../lib/utils";
 import { AgronomistChat } from "./AgronomistChat";
+import { countries } from "../lib/countries";
 
 interface MobileDashboardProps {
   result: AnalysisResult;
@@ -10,6 +11,7 @@ interface MobileDashboardProps {
 export const MobileDashboard = ({ result }: MobileDashboardProps) => {
   const [chatOpen, setChatOpen] = useState(false);
   const isHealthy = result.status === "healthy";
+  const countryData = countries.find(c => c.name === result.country);
   
   // Audio state
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -96,6 +98,10 @@ export const MobileDashboard = ({ result }: MobileDashboardProps) => {
            <div className="w-full h-full bg-surface-container flex items-center justify-center text-on-surface-variant">No Image</div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-[#0c1512] via-transparent to-transparent"></div>
+        <div className="absolute top-6 right-6 z-10 flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+          <span className="text-base">{countryData?.flag}</span>
+          <span className="text-[10px] font-bold text-white uppercase tracking-wider">{result.country}</span>
+        </div>
         <div className="absolute bottom-0 left-0 w-full px-6 pb-8">
           <div className="flex items-center gap-2 mb-2">
             {!isHealthy ? (

@@ -1,19 +1,19 @@
 import { cn } from '../lib/utils';
 import { useState, useEffect } from 'react';
-import { countries } from '../lib/countries';
+import { CountrySelector } from '../components/CountrySelector';
+import { Country } from '../lib/countries';
 
 export const SettingsScreen = ({ isOffline }: { isOffline: boolean }) => {
   const [offlineSync, setOfflineSync] = useState(true);
   const [dataSaver, setDataSaver] = useState(false);
-  const [defaultCountry, setDefaultCountry] = useState("United States");
+  const [defaultCountry, setDefaultCountry] = useState<Country>("United States");
 
   useEffect(() => {
     const saved = localStorage.getItem('default_country');
-    if (saved) setDefaultCountry(saved);
+    if (saved) setDefaultCountry(saved as Country);
   }, []);
 
-  const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const val = e.target.value;
+  const handleCountryChange = (val: Country) => {
     setDefaultCountry(val);
     localStorage.setItem('default_country', val);
   };
@@ -35,17 +35,8 @@ export const SettingsScreen = ({ isOffline }: { isOffline: boolean }) => {
                  <h3 className="font-bold text-white text-lg">Default Country</h3>
                  <p className="text-sm text-on-surface-variant max-w-sm">Automatically select this country when scanning crops, allowing AI to recommend localized commercial treatments instantly.</p>
                </div>
-               <div className="relative w-full md:w-64 shrink-0">
-                 <select 
-                    value={defaultCountry}
-                    onChange={handleCountryChange}
-                    className="w-full appearance-none bg-surface-container border border-outline-variant/30 text-white py-3 px-4 rounded-xl font-bold focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary cursor-pointer shadow-lg"
-                 >
-                   {countries.map(c => (
-                      <option key={c.code} value={c.name}>{c.flag || c.code} {c.name}</option>
-                   ))}
-                 </select>
-                 <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-white/50">expand_more</span>
+               <div className="w-full md:w-64 shrink-0">
+                 <CountrySelector value={defaultCountry} onChange={handleCountryChange} />
                </div>
              </div>
            </div>
