@@ -4,12 +4,13 @@
  */
 
 export interface AnalysisResult {
+  is_crop?: boolean;
   status: "healthy" | "diseased";
   disease_name: string;
   confidence_score: number;
   risk_level: "low" | "medium" | "high";
 
-  field_sector: string;
+  country: string;
   contextual_insight: string;
   
   image_analysis: {
@@ -42,5 +43,5 @@ export interface AnalysisResult {
   imageUrl?: string;
 }
 
-export type Region = "West Africa" | "East Africa" | "Southern Africa" | "South Asia" | "Latin America";
+export type Country = string;
 

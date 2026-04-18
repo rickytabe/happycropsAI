@@ -28,7 +28,7 @@ export const AgronomistChat = ({ result, forceOpen = false, onClose }: ChatProps
     if (onClose) onClose();
   };
   const [messages, setMessages] = useState<Message[]>([
-    { role: "model", text: `Hello! I'm your AI Agronomist. I've analyzed your crop and found ${result.disease_name}. Do you have any questions about the treatment?` }
+    { role: "model", text: `Hello! I'm your AI Crop Expert. I've analyzed your crop and found ${result.disease_name}. Do you have any questions about the treatment?` }
   ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -99,7 +99,7 @@ export const AgronomistChat = ({ result, forceOpen = false, onClose }: ChatProps
                   <Bot className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-sm tracking-widest uppercase">Ask AI Agronomist</h3>
+                  <h3 className="font-bold text-sm tracking-widest uppercase">Ask AI Crop Expert</h3>
                   <div className="text-[10px] text-editorial-emerald flex items-center gap-1 mt-0.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-editorial-emerald animate-pulse"></span>
                     Online

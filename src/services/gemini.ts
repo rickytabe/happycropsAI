@@ -1,16 +1,16 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { AnalysisResult, Region } from "../types";
+import { AnalysisResult, Country } from "../types";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
 const SCHEMA = {
   type: Type.OBJECT,
   properties: {
+    is_crop: { type: Type.BOOLEAN, description: "True if the image clearly shows a plant, crop, leaf or agricultural field. False if it is a human, animal, face, or completely irrelevant object." },
     status: { type: Type.STRING, description: "Either 'healthy' or 'diseased'" },
     disease_name: { type: Type.STRING, description: "Name. E.g., 'Late Blight'" },
     confidence_score: { type: Type.NUMBER, description: "0 to 1 confidence level" },
     risk_level: { type: Type.STRING, description: "low, medium, or high" },
-    field_sector: { type: Type.STRING, description: "E.g., North-West C-12" },
     contextual_insight: { type: Type.STRING, description: "Full intro text. Our AI analysis has identified..." },
     image_analysis: {
       type: Type.OBJECT,
@@ -56,27 +56,27 @@ const SCHEMA = {
     preventive_measures: { type: Type.ARRAY, items: { type: Type.STRING, description: "Short bullet point" } }
   },
   required: [
-    "status", "disease_name", "confidence_score", "risk_level",
-    "field_sector", "contextual_insight", "image_analysis", 
+    "is_crop", "status", "disease_name", "confidence_score", "risk_level",
+    "contextual_insight", "image_analysis", 
     "untreated_impact", "spread_factors", "treatment_steps", "preventive_measures"
   ]
 };
 
-export async function analyzeCropImage(base64Image: string, region: Region): Promise<AnalysisResult> {
+export async function analyzeCropImage(base64Image: string, country: Country): Promise<AnalysisResult> {
   const model = "gemini-3-flash-preview";
 
   const prompt = `
-    Analyze this crop image for a farmer in ${region}. 
+    Analyze this cropped image for a farmer in ${country}. 
     
     CRITICAL CONSTRAINTS - YOU MUST FOLLOW EXACTLY:
+    - FIRST CHECK (Security): Determine if the image is actually of a plant, crop, or agricultural leaf. If it is a person, face, animal, or random object, set 'is_crop' to false and fill the rest of the fields with generic terms like "N/A" and 0. If it IS a plant, set 'is_crop' to true and complete the analysis accurately.
     - Target audience: Farmers. Provide a clear, actionable diagnostic report.
     - 'disease_name': Just the name (e.g., "Late Blight"). The UI will append "Detected".
-    - 'field_sector': Make up a realistic field sector like "North-West C-12".
     - 'contextual_insight': e.g., "Our AI analysis has identified active {disease_name} in your crops. Immediate action is required."
-    - 'image_analysis': photo_id (e.g. "#042"), description (e.g. "Typical lesions showing dark appearance...")
+    - 'image_analysis': photo_id (always "#1"), description (e.g. "Typical lesions showing dark appearance...")
     - 'untreated_impact': value_lost (e.g., "Up to 80%"), description ("Without treatment, this pathogen can destroy..."), risk_label ("Severe risk detected"), risk_percentage (0-100).
     - 'spread_factors': Provide exactly 2 spread factors with an appropriate Google Material Icon name ('rainy', 'thermometer', 'air', 'bug_report', 'water_drop').
-    - 'treatment_steps': Maximum 2 steps. Provide a short title and a description. If recommending chemical treatments (like fungicides or pesticides), you MUST include EXACT common commercial product names available in ${region} (e.g., 'Ridomil Gold', 'Dithane M-45', 'Bravo 500') instead of just the active ingredients.
+    - 'treatment_steps': Maximum 2 steps. Provide a short title and a description. If recommending chemical treatments (like fungicides or pesticides), you MUST include EXACT common commercial product names available in ${country} (e.g., 'Ridomil Gold', 'Dithane M-45', 'Bravo 500') instead of just the active ingredients.
     - 'preventive_measures': Maximum 3 bullet points.
     
     Return strictly in JSON matching the schema.
@@ -99,24 +99,31 @@ export async function analyzeCropImage(base64Image: string, region: Region): Pro
       }
     });
 
-    const result = JSON.parse(response.text || "{}") as AnalysisResult;
+    const result = JSON.parse(response.text || "{}");
+    
+    if (result.is_crop === false) {
+      throw new Error("NOT_A_PLANT");
+    }
+
     return {
       ...result,
       timestamp: Date.now(),
-      imageUrl: base64Image
-    };
-  } catch (error) {
+      imageUrl: base64Image,
+      country
+    } as AnalysisResult;
+  } catch (error: any) {
     console.error("AI Analysis failed:", error);
+    if (error?.message === "NOT_A_PLANT") throw error; // Re-throw to be caught by UI
     // Fallback mock for demo if API fails
     return {
       status: "diseased",
       disease_name: "Late Blight",
       confidence_score: 0.95,
       risk_level: "high",
-      field_sector: "North-West C-12",
+      country: country,
       contextual_insight: "Our AI analysis has identified active Late Blight in your potato crops. Immediate action is required to prevent widespread infection.",
       image_analysis: {
-        photo_id: "#042",
+        photo_id: "#1",
         description: "Typical lesions showing dark, water-soaked appearance with faint white mold on the leaf underside."
       },
       untreated_impact: {
@@ -152,7 +159,7 @@ export async function chatWithAgronomist(
   const model = "gemini-3-flash-preview";
   
   const systemInstruction = `
-    You are an expert AI Agronomist assisting a non-technical smallholder farmer.
+    You are an expert AI Crop Expert assisting a non-technical smallholder farmer.
     You just diagnosed their crop with: ${contextResult.disease_name}.
     Risk level: ${contextResult.risk_level}.
     Treatment suggested: ${contextResult.treatment_steps.join("; ")}.

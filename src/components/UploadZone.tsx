@@ -36,7 +36,7 @@ export const UploadZone = ({ onImageSelect, selectedRegion, onRegionChange }: Up
           <span className="text-editorial-emerald">Protect your crops.</span>
         </h1>
         <p className="text-lg md:text-xl text-white/50 font-medium max-w-xl mx-auto">
-          Production-grade AI agronomist for smallholder farmers. Precise diagnosis with localized environmental context.
+          Production-grade AI Crop Expert for smallholder farmers. Precise diagnosis with localized environmental context.
         </p>
       </motion.div>
 

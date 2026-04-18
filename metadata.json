@@ -1,6 +1,6 @@
 {
   "name": "AgriNova AI",
-  "description": "An offline-first AI Agronomist for smallholder farmers providing instant crop diagnosis and localized advice.",
+  "description": "An offline-first AI Crop Expert for smallholder farmers providing instant crop diagnosis and localized advice.",
   "requestFramePermissions": ["camera"],
   "majorCapabilities": []
 }
