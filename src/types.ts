@@ -9,21 +9,33 @@ export interface AnalysisResult {
   confidence_score: number;
   risk_level: "low" | "medium" | "high";
 
-  cause: {
-    biological: string;
-    environmental: string;
+  field_sector: string;
+  contextual_insight: string;
+  
+  image_analysis: {
+    photo_id: string;
+    description: string;
   };
 
-  treatment_steps: string[];
+  untreated_impact: {
+    value_lost: string;
+    description: string;
+    risk_label: string;
+    risk_percentage: number;
+  };
+
+  spread_factors: {
+    icon_name: string;
+    title: string;
+    description: string;
+  }[];
+
+  treatment_steps: {
+    title: string;
+    description: string;
+  }[];
+
   preventive_measures: string[];
-
-  contextual_insight: string;
-
-  untreated_impact: string;
-
-  // 🔥 CRITICAL DIFFERENTIATORS
-  location_context: string;
-  seasonal_advice: string;
   
   // UI Metadata
   timestamp: number;
@@ -31,3 +43,4 @@ export interface AnalysisResult {
 }
 
 export type Region = "West Africa" | "East Africa" | "Southern Africa" | "South Asia" | "Latin America";
+

@@ -7,28 +7,58 @@ const SCHEMA = {
   type: Type.OBJECT,
   properties: {
     status: { type: Type.STRING, description: "Either 'healthy' or 'diseased'" },
-    disease_name: { type: Type.STRING, description: "Specific name of the disease or 'Healthy Crop'" },
+    disease_name: { type: Type.STRING, description: "Name. E.g., 'Late Blight'" },
     confidence_score: { type: Type.NUMBER, description: "0 to 1 confidence level" },
     risk_level: { type: Type.STRING, description: "low, medium, or high" },
-    cause: {
+    field_sector: { type: Type.STRING, description: "E.g., North-West C-12" },
+    contextual_insight: { type: Type.STRING, description: "Full intro text. Our AI analysis has identified..." },
+    image_analysis: {
       type: Type.OBJECT,
       properties: {
-        biological: { type: Type.STRING },
-        environmental: { type: Type.STRING }
+        photo_id: { type: Type.STRING, description: "E.g., #042" },
+        description: { type: Type.STRING, description: "Typical lesions..." }
       },
-      required: ["biological", "environmental"]
+      required: ["photo_id", "description"]
     },
-    treatment_steps: { type: Type.ARRAY, items: { type: Type.STRING } },
-    preventive_measures: { type: Type.ARRAY, items: { type: Type.STRING } },
-    contextual_insight: { type: Type.STRING },
-    untreated_impact: { type: Type.STRING },
-    location_context: { type: Type.STRING },
-    seasonal_advice: { type: Type.STRING }
+    untreated_impact: {
+      type: Type.OBJECT,
+      properties: {
+        value_lost: { type: Type.STRING, description: "E.g., 'Up to 80%'" },
+        description: { type: Type.STRING, description: "Without treatment..." },
+        risk_label: { type: Type.STRING, description: "E.g., 'Severe risk detected'" },
+        risk_percentage: { type: Type.NUMBER, description: "Risk bar width 0-100" }
+      },
+      required: ["value_lost", "description", "risk_label", "risk_percentage"]
+    },
+    spread_factors: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          icon_name: { type: Type.STRING, description: "Google Material Symbol Outlined name (e.g. 'rainy', 'thermometer', 'pest_control')" },
+          title: { type: Type.STRING },
+          description: { type: Type.STRING }
+        },
+        required: ["icon_name", "title", "description"]
+      }
+    },
+    treatment_steps: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          title: { type: Type.STRING, description: "E.g., 'Apply Fungicide'" },
+          description: { type: Type.STRING }
+        },
+        required: ["title", "description"]
+      }
+    },
+    preventive_measures: { type: Type.ARRAY, items: { type: Type.STRING, description: "Short bullet point" } }
   },
   required: [
-    "status", "disease_name", "confidence_score", "risk_level", 
-    "cause", "treatment_steps", "preventive_measures", 
-    "contextual_insight", "untreated_impact", "location_context", "seasonal_advice"
+    "status", "disease_name", "confidence_score", "risk_level",
+    "field_sector", "contextual_insight", "image_analysis", 
+    "untreated_impact", "spread_factors", "treatment_steps", "preventive_measures"
   ]
 };
 
@@ -37,12 +67,19 @@ export async function analyzeCropImage(base64Image: string, region: Region): Pro
 
   const prompt = `
     Analyze this crop image for a farmer in ${region}. 
-    Provide a detailed, farmer-friendly diagnosis.
-    Focus on practical advice that can be followed without expensive equipment.
-    If the crop is healthy, provide tips for maintaining health and maximizing yield.
-    If diseased, identify it accurately and provide a clear treatment plan.
-    Explain the impact if ignored (e.g., "yield could drop by 40%").
-    Return the response strictly in JSON format matching the schema.
+    
+    CRITICAL CONSTRAINTS - YOU MUST FOLLOW EXACTLY:
+    - Target audience: Farmers. Provide a clear, actionable diagnostic report.
+    - 'disease_name': Just the name (e.g., "Late Blight"). The UI will append "Detected".
+    - 'field_sector': Make up a realistic field sector like "North-West C-12".
+    - 'contextual_insight': e.g., "Our AI analysis has identified active {disease_name} in your crops. Immediate action is required."
+    - 'image_analysis': photo_id (e.g. "#042"), description (e.g. "Typical lesions showing dark appearance...")
+    - 'untreated_impact': value_lost (e.g., "Up to 80%"), description ("Without treatment, this pathogen can destroy..."), risk_label ("Severe risk detected"), risk_percentage (0-100).
+    - 'spread_factors': Provide exactly 2 spread factors with an appropriate Google Material Icon name ('rainy', 'thermometer', 'air', 'bug_report', 'water_drop').
+    - 'treatment_steps': Maximum 2 steps. Provide a short title and a description. If recommending chemical treatments (like fungicides or pesticides), you MUST include EXACT common commercial product names available in ${region} (e.g., 'Ridomil Gold', 'Dithane M-45', 'Bravo 500') instead of just the active ingredients.
+    - 'preventive_measures': Maximum 3 bullet points.
+    
+    Return strictly in JSON matching the schema.
   `;
 
   try {
@@ -73,29 +110,76 @@ export async function analyzeCropImage(base64Image: string, region: Region): Pro
     // Fallback mock for demo if API fails
     return {
       status: "diseased",
-      disease_name: "Late Blight (Phytophthora infestans)",
-      confidence_score: 0.89,
+      disease_name: "Late Blight",
+      confidence_score: 0.95,
       risk_level: "high",
-      cause: {
-        biological: "A water mold that spreads rapidly in cool, wet conditions.",
-        environmental: `High humidity in ${region} is currently favoring fungal spread.`
+      field_sector: "North-West C-12",
+      contextual_insight: "Our AI analysis has identified active Late Blight in your potato crops. Immediate action is required to prevent widespread infection.",
+      image_analysis: {
+        photo_id: "#042",
+        description: "Typical lesions showing dark, water-soaked appearance with faint white mold on the leaf underside."
       },
+      untreated_impact: {
+        value_lost: "Up to 80%",
+        description: "Without treatment, this pathogen can destroy your entire harvest within 7-10 days under current weather conditions.",
+        risk_label: "Severe risk detected",
+        risk_percentage: 80
+      },
+      spread_factors: [
+        { icon_name: "rainy", title: "Rain & Wind", description: "Spores travel easily through moisture and breeze to nearby plants." },
+        { icon_name: "thermometer", title: "Cool & Damp", description: "Thrives in the current 60°F-75°F temperature window." }
+      ],
       treatment_steps: [
-        "Remove and destroy infected leaves immediately.",
-        "Ensure better spacing between plants for airflow.",
-        "Apply a copper-based fungicide to healthy neighboring plants."
+        { title: "Apply Fungicide", description: "Spray a commercial fungicide like Ridomil Gold (Metalaxyl) or Dithane M-45 (Mancozeb) immediately to protect healthy leaves." },
+        { title: "Remove Infected Plants", description: "Pull up and bag heavily damaged plants. Do not compost them." }
       ],
       preventive_measures: [
-        "Avoid overhead watering; water at the base of the plant.",
-        "Use disease-resistant varieties for the next planting season.",
-        "Rotate crops - don't plant tomatoes or potatoes in the same spot."
+        "Increase spacing between rows",
+        "Avoid evening watering",
+        "Use resistant crop varieties"
       ],
-      contextual_insight: "This is a common issue during the current rainy season in your area.",
-      untreated_impact: "This could reduce yield by 60% within 10-14 days if not managed.",
-      location_context: "Commonly affects smallholder farms in highland regions.",
-      seasonal_advice: "Plan for better drainage systems before the next heavy rains.",
       timestamp: Date.now(),
       imageUrl: base64Image
     };
+  }
+}
+
+export async function chatWithAgronomist(
+  contextResult: AnalysisResult,
+  chatHistory: { role: "user" | "model", text: string }[],
+  userMessage: string
+): Promise<string> {
+  const model = "gemini-3-flash-preview";
+  
+  const systemInstruction = `
+    You are an expert AI Agronomist assisting a non-technical smallholder farmer.
+    You just diagnosed their crop with: ${contextResult.disease_name}.
+    Risk level: ${contextResult.risk_level}.
+    Treatment suggested: ${contextResult.treatment_steps.join("; ")}.
+    Keep answers very simple, empathetic, and short (max 2-3 sentences).
+    No scientific jargon.
+  `;
+
+  try {
+    const contents = chatHistory.map(msg => ({
+      role: msg.role === "model" ? "model" : "user",
+      parts: [{ text: msg.text }]
+    }));
+    
+    contents.push({ role: "user", parts: [{ text: userMessage }] });
+
+    const response = await ai.models.generateContent({
+      model,
+      contents,
+      config: {
+        systemInstruction,
+        temperature: 0.4
+      }
+    });
+
+    return response.text || "I'm having trouble connecting. Could you try asking again?";
+  } catch (error) {
+    console.error("Chat error:", error);
+    return "The connection is weak right now, but I recommend following the treatment steps above immediately to save your crop.";
   }
 }
