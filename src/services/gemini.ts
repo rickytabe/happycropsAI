@@ -11,7 +11,7 @@ const SCHEMA = {
     disease_name: { type: Type.STRING, description: "Name. E.g., 'Late Blight'" },
     confidence_score: { type: Type.NUMBER, description: "0 to 1 confidence level" },
     risk_level: { type: Type.STRING, description: "low, medium, or high" },
-    contextual_insight: { type: Type.STRING, description: "Full intro text. Our AI analysis has identified..." },
+    contextual_insight: { type: Type.STRING, description: "Full intro text naming the specific plant and causative agents. E.g., Our AI analysis has identified active Late Blight in your potato plants. This is caused by..." },
     image_analysis: {
       type: Type.OBJECT,
       properties: {
@@ -63,7 +63,7 @@ const SCHEMA = {
 };
 
 export async function analyzeCropImage(base64Image: string, country: Country): Promise<AnalysisResult> {
-  const model = "gemini-3-flash-preview";
+  const model = "gemini-3.1-flash-lite-preview";
 
   const prompt = `
     Analyze this cropped image for a farmer in ${country}. 
@@ -72,7 +72,7 @@ export async function analyzeCropImage(base64Image: string, country: Country): P
     - FIRST CHECK (Security): Determine if the image is actually of a plant, crop, or agricultural leaf. If it is a person, face, animal, or random object, set 'is_crop' to false and fill the rest of the fields with generic terms like "N/A" and 0. If it IS a plant, set 'is_crop' to true and complete the analysis accurately.
     - Target audience: Farmers. Provide a clear, actionable diagnostic report.
     - 'disease_name': Just the name (e.g., "Late Blight"). The UI will append "Detected".
-    - 'contextual_insight': e.g., "Our AI analysis has identified active {disease_name} in your crops. Immediate action is required."
+    - 'contextual_insight': Base it on the specific plant identified, not just 'crops'. E.g., "Our AI analysis has identified active {disease_name} in your {identified_plant_name, e.g. coffee plants, maize}. Immediate action is required. This is typically caused by {briefly state causative agents, e.g. a specific fungus or bacteria}."
     - 'image_analysis': photo_id (always "#1"), description (e.g. "Typical lesions showing dark appearance...")
     - 'untreated_impact': value_lost (e.g., "Up to 80%"), description ("Without treatment, this pathogen can destroy..."), risk_label ("Severe risk detected"), risk_percentage (0-100).
     - 'spread_factors': Provide exactly 2 spread factors with an appropriate Google Material Icon name ('rainy', 'thermometer', 'air', 'bug_report', 'water_drop').
@@ -156,7 +156,7 @@ export async function chatWithAgronomist(
   chatHistory: { role: "user" | "model", text: string }[],
   userMessage: string
 ): Promise<string> {
-  const model = "gemini-3-flash-preview";
+  const model = "gemini-3.1-flash-lite-preview";
   
   const systemInstruction = `
     You are an expert AI Crop Expert assisting a non-technical smallholder farmer.

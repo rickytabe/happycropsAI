@@ -1,14 +1,10 @@
 import { AnalysisResult } from '../types';
-import { countries } from '../lib/countries';
+import { CountryFlag } from '../components/CountryFlag';
 
-export const ActivityScreen = ({ history }: { history: AnalysisResult[] }) => {
+export const ActivityScreen = ({ history, deleteHistory }: { history: AnalysisResult[], deleteHistory: (t: number) => void }) => {
   // Sort history by timestamp descending
   const sortedHistory = [...history].sort((a, b) => b.timestamp - a.timestamp);
 
-  const getFlag = (countryName: string) => {
-    const country = countries.find(c => c.name === countryName);
-    return country?.flag || "";
-  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -36,13 +32,16 @@ export const ActivityScreen = ({ history }: { history: AnalysisResult[] }) => {
                   </div>
                   <h3 className="text-xl font-bold text-white mb-2">Performed Diagnostic Scan</h3>
                   <div className="flex items-center gap-2">
-                    <span className="text-2xl" role="img" aria-label="flag">{getFlag(scan.country)}</span>
+                     <CountryFlag countryName={scan.country} size={22} />
                     <p className="text-on-surface-variant">
                       Analyzed <span className="text-primary font-bold">{scan.disease_name}</span> in {scan.country}. 
                       Risk identified as <span className={scan.risk_level === 'high' ? 'text-red-400' : 'text-amber-400'}>{scan.risk_level}</span>.
                     </p>
                   </div>
                 </div>
+                <button onClick={(e) => { e.stopPropagation(); if (window.confirm('Delete this activity record?')) deleteHistory(scan.timestamp); }} className="ml-auto opacity-0 group-hover:opacity-100 p-2 text-on-surface-variant hover:text-red-500 transition-all rounded-full" title="Delete record">
+                  <span className="material-symbols-outlined text-[24px]">delete</span>
+                </button>
               </div>
             ))
           ) : (

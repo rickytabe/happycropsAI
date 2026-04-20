@@ -9,9 +9,12 @@ import { DiagnosticsListScreen } from './screens/DiagnosticsListScreen';
 import { ActivityScreen } from './screens/ActivityScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { AnalysisResult } from './types';
+import { getSession, clearSession, isAuthenticated as checkAuth } from './services/session';
 
 export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // Initialize directly from localStorage so page reloads preserve the session
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => checkAuth());
+  const [session, setSession] = useState(() => getSession());
   const [history, setHistory] = useState<AnalysisResult[]>([]);
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
 
@@ -40,6 +43,12 @@ export default function App() {
     localStorage.setItem('agrinova_history', JSON.stringify(newHistory));
   };
 
+  const deleteHistory = (timestamp: number) => {
+    const newHistory = history.filter(h => h.timestamp !== timestamp);
+    setHistory(newHistory);
+    localStorage.setItem('agrinova_history', JSON.stringify(newHistory));
+  };
+
   return (
     <BrowserRouter>
       <Routes>
@@ -58,7 +67,7 @@ export default function App() {
           path="/dashboard/*" 
           element={
             isAuthenticated ? (
-              <DashboardLayout isOffline={isOffline} onLogout={() => setIsAuthenticated(false)}>
+              <DashboardLayout isOffline={isOffline} onLogout={() => { clearSession(); setIsAuthenticated(false); setSession(null); }}>
                 <Outlet />
               </DashboardLayout>
             ) : (
@@ -67,9 +76,9 @@ export default function App() {
           }
         >
           <Route index element={<IntelligenceScreen history={history} addHistory={addHistory} />} />
-          <Route path="diagnostics" element={<DiagnosticsListScreen history={history} />} />
-          <Route path="diagnostic/:id" element={<ResultsScreen history={history} />} />
-          <Route path="activity" element={<ActivityScreen history={history} />} />
+          <Route path="diagnostics" element={<DiagnosticsListScreen history={history} deleteHistory={deleteHistory} />} />
+          <Route path="diagnostic/:id" element={<ResultsScreen history={history} deleteHistory={deleteHistory} />} />
+          <Route path="activity" element={<ActivityScreen history={history} deleteHistory={deleteHistory} />} />
           <Route path="settings" element={<SettingsScreen isOffline={isOffline} />} />
         </Route>
 

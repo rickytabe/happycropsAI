@@ -2,14 +2,11 @@ import { AnalysisResult } from '../types';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import { motion } from 'motion/react';
-import { countries } from '../lib/countries';
+import { CountryFlag } from '../components/CountryFlag';
 
-export const DiagnosticsListScreen = ({ history }: { history: AnalysisResult[] }) => {
+export const DiagnosticsListScreen = ({ history, deleteHistory }: { history: AnalysisResult[], deleteHistory: (t: number) => void }) => {
   const navigate = useNavigate();
 
-  const getFlag = (countryName: string) => {
-    return countries.find(c => c.name === countryName)?.flag || "";
-  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -38,8 +35,11 @@ export const DiagnosticsListScreen = ({ history }: { history: AnalysisResult[] }
                  transition={{ delay: i * 0.05 }}
                  key={scan.timestamp} 
                  onClick={() => navigate(`/dashboard/diagnostic/${scan.timestamp}`)} 
-                 className="flex flex-col md:flex-row items-center gap-6 p-4 md:p-6 bg-surface-container/50 hover:bg-surface-container transition-colors rounded-2xl cursor-pointer border border-white/5 hover:border-white/20 group"
+                 className="flex flex-col md:flex-row items-center gap-6 p-4 md:p-6 bg-surface-container/50 hover:bg-surface-container transition-colors rounded-2xl cursor-pointer border border-white/5 hover:border-white/20 group relative"
                >
+                 <button onClick={(e) => { e.stopPropagation(); if (window.confirm('Delete this diagnostic report?')) deleteHistory(scan.timestamp); }} className="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 p-2 text-on-surface-variant hover:text-red-500 transition-all focus:opacity-100" title="Delete record">
+                   <span className="material-symbols-outlined text-[24px]">delete</span>
+                 </button>
                  <div className="w-full md:w-32 h-32 md:h-24 rounded-xl overflow-hidden flex-shrink-0 relative bg-surface-container-highest">
                    {scan.imageUrl && (
                       <img className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" src={scan.imageUrl} alt={scan.disease_name} />
@@ -51,8 +51,8 @@ export const DiagnosticsListScreen = ({ history }: { history: AnalysisResult[] }
                      <div className="flex flex-col">
                        <h3 className="font-headline text-2xl font-bold text-white">{scan.disease_name}</h3>
                        <div className="flex items-center gap-1.5 text-on-surface-variant font-bold text-xs uppercase tracking-widest mt-0.5">
-                         <span>{getFlag(scan.country)}</span>
-                         <span>{scan.country}</span>
+                        <CountryFlag countryName={scan.country} size={16} />
+                          <span>{scan.country}</span>
                        </div>
                      </div>
                      <span className="text-sm font-bold text-on-surface-variant">{new Date(scan.timestamp).toLocaleDateString()}</span>

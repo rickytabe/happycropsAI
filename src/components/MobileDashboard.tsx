@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { AnalysisResult } from "../types";
 import { cn } from "../lib/utils";
 import { AgronomistChat } from "./AgronomistChat";
-import { countries } from "../lib/countries";
+import { CountryFlag } from "./CountryFlag";
 
 interface MobileDashboardProps {
   result: AnalysisResult;
@@ -11,7 +11,6 @@ interface MobileDashboardProps {
 export const MobileDashboard = ({ result }: MobileDashboardProps) => {
   const [chatOpen, setChatOpen] = useState(false);
   const isHealthy = result.status === "healthy";
-  const countryData = countries.find(c => c.name === result.country);
   
   // Audio state
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -91,19 +90,21 @@ export const MobileDashboard = ({ result }: MobileDashboardProps) => {
 
   return (
     <>
-      <section className={getGlow('header', "relative h-[45vh] w-full overflow-hidden", "ring-4 ring-primary ring-inset")}>
+      {/* Hero — full-bleed, no borders, integrated with background */}
+      <section className={getGlow('header', "relative h-[52vh] w-full overflow-hidden -mx-3", "ring-4 ring-primary ring-inset")} style={{ marginLeft: '-0.75rem', marginRight: '-0.75rem', width: 'calc(100% + 1.5rem)' }}>
         {result.imageUrl ? (
            <img alt={result.disease_name} className="w-full h-full object-cover" src={result.imageUrl}/>
         ) : (
            <div className="w-full h-full bg-surface-container flex items-center justify-center text-on-surface-variant">No Image</div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0c1512] via-transparent to-transparent"></div>
-        <div className="absolute top-6 right-6 z-10 flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
-          <span className="text-base">{countryData?.flag}</span>
+        {/* Multi-stop fade: transparent top → heavy at bottom to merge with page bg */}
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(12,21,18,0.1) 0%, rgba(12,21,18,0.15) 40%, rgba(12,21,18,0.75) 70%, #0c1512 100%)' }} />
+        <div className="absolute top-5 right-4 z-10 flex items-center gap-2 bg-black/40 backdrop-blur-md px-2.5 py-1.5 rounded-full border border-white/10">
+          <CountryFlag countryName={result.country} size={18} />
           <span className="text-[10px] font-bold text-white uppercase tracking-wider">{result.country}</span>
         </div>
-        <div className="absolute bottom-0 left-0 w-full px-6 pb-8">
-          <div className="flex items-center gap-2 mb-2">
+        <div className="absolute bottom-0 left-0 w-full px-4 pb-6">
+          <div className="flex items-center gap-2 mb-1.5">
             {!isHealthy ? (
                <>
                  <span className="w-2 h-2 rounded-full bg-error animate-pulse"></span>
@@ -116,12 +117,12 @@ export const MobileDashboard = ({ result }: MobileDashboardProps) => {
                </>
             )}
           </div>
-          <h2 className="font-headline text-4xl font-medium leading-tight text-on-surface">{result.disease_name}</h2>
-          <p className="text-primary mt-1 italic font-headline text-lg line-clamp-2">{result.contextual_insight}</p>
+          <h2 className="font-headline text-4xl font-medium leading-tight text-white">{result.disease_name}</h2>
+          <p className="text-primary/90 mt-1 italic font-headline text-base line-clamp-2">{result.contextual_insight}</p>
         </div>
       </section>
 
-      <main className="px-4 space-y-6 max-w-md mx-auto -mt-4 relative z-10 pb-6">
+      <main className="px-3 space-y-4 max-w-lg mx-auto -mt-2 relative z-10 pb-8">
         <section>
           <button 
              onClick={toggleSpeech}

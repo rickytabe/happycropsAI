@@ -4,9 +4,10 @@ import { analyzeCropImage } from '../services/gemini';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
-import { countries, Country } from '../lib/countries';
+import { countries } from '../lib/countries';
 import { ScanningLoader } from '../components/ScanningLoader';
 import { CountrySelector } from '../components/CountrySelector';
+import { CountryFlag } from '../components/CountryFlag';
 
 interface IntelligenceScreenProps {
   history: AnalysisResult[];
@@ -190,9 +191,7 @@ export const IntelligenceScreen = ({ history, addHistory }: IntelligenceScreenPr
                       <span className="text-xs text-on-surface-variant font-label whitespace-nowrap">{new Date(scan.timestamp).toLocaleDateString()}</span>
                     </div>
                     <div className="flex items-center gap-2 mb-4">
-                      <span className="text-xl">
-                        {countries.find(c => c.name === scan.country)?.flag}
-                      </span>
+                      <CountryFlag countryName={scan.country} size={22} />
                       <p className="text-sm text-on-surface-variant truncate">{scan.country}</p>
                     </div>
                     <div className="flex items-center gap-2">

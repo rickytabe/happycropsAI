@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { AnalysisResult } from "../types";
 import { cn } from "../lib/utils";
 import { AgronomistChat } from "./AgronomistChat";
-import { countries } from "../lib/countries";
+import { CountryFlag } from "./CountryFlag";
 
 interface DesktopDashboardProps {
   result: AnalysisResult;
@@ -102,10 +102,7 @@ export const DesktopDashboard = ({ result }: DesktopDashboardProps) => {
               {alertText}
             </span>
             <span className="text-white/60 text-sm tracking-wide flex items-center gap-2">
-              <span className="text-xl">
-                {countries.find(c => c.name === result.country)?.flag}
-              </span>
-              Country: {result.country}
+              Country: <CountryFlag countryName={result.country} size={22} /> {result.country}
             </span>
           </div>
           <h1 className="font-headline text-6xl md:text-7xl font-light text-white mb-4">

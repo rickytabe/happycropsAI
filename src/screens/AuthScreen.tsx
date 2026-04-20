@@ -2,13 +2,21 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { MeshBackground } from '../components/MeshBackground';
+import { saveSession } from '../services/session';
 
 export const AuthScreen = ({ onLogin }: { onLogin: () => void }) => {
   const [isLogin, setIsLogin] = useState(true);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const navigate = useNavigate();
 
   const handleAuth = (e: React.FormEvent) => {
     e.preventDefault();
+    // Save session to localStorage — swap this for a real API call when backend is ready
+    saveSession({
+      name: name || email.split('@')[0], // fallback to email prefix if no name
+      email,
+    });
     onLogin();
     navigate('/dashboard');
   };
@@ -38,12 +46,12 @@ export const AuthScreen = ({ onLogin }: { onLogin: () => void }) => {
           {!isLogin && (
             <div>
               <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">Full Name</label>
-              <input required type="text" className="w-full bg-surface-container-high border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors" placeholder="Jane Doe" />
+              <input required type="text" value={name} onChange={e => setName(e.target.value)} className="w-full bg-surface-container-high border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors" placeholder="Jane Doe" />
             </div>
           )}
           <div>
             <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">Email Address</label>
-            <input required type="email" className="w-full bg-surface-container-high border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors" placeholder="name@farm.com" />
+            <input required type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-surface-container-high border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors" placeholder="name@farm.com" />
           </div>
           <div>
             <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">Password</label>
