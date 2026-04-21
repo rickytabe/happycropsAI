@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 import { PublicLanding } from './screens/PublicLanding';
 import { AuthScreen } from './screens/AuthScreen';
 import { DashboardLayout } from './layouts/DashboardLayout';
@@ -50,40 +51,43 @@ export default function App() {
   };
 
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* PUBLIC ROUTES */}
-        <Route 
-          path="/" 
-          element={!isAuthenticated ? <PublicLanding /> : <Navigate to="/dashboard" replace />} 
-        />
-        <Route 
-          path="/auth" 
-          element={!isAuthenticated ? <AuthScreen onLogin={() => setIsAuthenticated(true)} /> : <Navigate to="/dashboard" replace />} 
-        />
+    <>
+      <BrowserRouter>
+        <Routes>
+          {/* PUBLIC ROUTES */}
+          <Route 
+            path="/" 
+            element={!isAuthenticated ? <PublicLanding /> : <Navigate to="/dashboard" replace />} 
+          />
+          <Route 
+            path="/auth" 
+            element={!isAuthenticated ? <AuthScreen onLogin={() => setIsAuthenticated(true)} /> : <Navigate to="/dashboard" replace />} 
+          />
 
-        {/* PROTECTED ROUTES */}
-        <Route 
-          path="/dashboard/*" 
-          element={
-            isAuthenticated ? (
-              <DashboardLayout isOffline={isOffline} onLogout={() => { clearSession(); setIsAuthenticated(false); setSession(null); }}>
-                <Outlet />
-              </DashboardLayout>
-            ) : (
-              <Navigate to="/auth" replace />
-            )
-          }
-        >
-          <Route index element={<IntelligenceScreen history={history} addHistory={addHistory} />} />
-          <Route path="diagnostics" element={<DiagnosticsListScreen history={history} deleteHistory={deleteHistory} />} />
-          <Route path="diagnostic/:id" element={<ResultsScreen history={history} deleteHistory={deleteHistory} />} />
-          <Route path="activity" element={<ActivityScreen history={history} deleteHistory={deleteHistory} />} />
-          <Route path="settings" element={<SettingsScreen isOffline={isOffline} />} />
-        </Route>
+          {/* PROTECTED ROUTES */}
+          <Route 
+            path="/dashboard/*" 
+            element={
+              isAuthenticated ? (
+                <DashboardLayout isOffline={isOffline} onLogout={() => { clearSession(); setIsAuthenticated(false); setSession(null); }}>
+                  <Outlet />
+                </DashboardLayout>
+              ) : (
+                <Navigate to="/auth" replace />
+              )
+            }
+          >
+            <Route index element={<IntelligenceScreen history={history} addHistory={addHistory} />} />
+            <Route path="diagnostics" element={<DiagnosticsListScreen history={history} deleteHistory={deleteHistory} />} />
+            <Route path="diagnostic/:id" element={<ResultsScreen history={history} deleteHistory={deleteHistory} />} />
+            <Route path="activity" element={<ActivityScreen history={history} deleteHistory={deleteHistory} />} />
+            <Route path="settings" element={<SettingsScreen isOffline={isOffline} />} />
+          </Route>
 
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+      <Analytics />
+    </>
   );
 }
