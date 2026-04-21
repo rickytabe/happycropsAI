@@ -171,7 +171,7 @@ export const DashboardLayout = ({ children, isOffline, onLogout }: DashboardLayo
 
       {/* ── Main Content ─────────────────────────────────────────── */}
       <main className="md:ml-64 pt-16 md:pt-20 pb-8 md:pb-20 min-h-screen relative">
-        <div className="relative z-10 w-full mx-auto px-3 md:px-10 pt-10">
+        <div className="relative z-10 w-full mx-auto px-3 md:px-10 pt-7">
           {children}
         </div>
       </main>
