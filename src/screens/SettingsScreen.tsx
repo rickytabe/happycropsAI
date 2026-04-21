@@ -101,7 +101,7 @@ export const SettingsScreen = ({ isOffline }: { isOffline: boolean }) => {
               </div>
               <div>
                 <h3 className="text-2xl font-bold text-white">Guest Crop Expert</h3>
-                <p className="text-on-surface-variant">guest@agrinova.ai</p>
+                <p className="text-on-surface-variant">guest@happycropsai.com</p>
                 <div className="mt-2 text-xs font-bold text-primary uppercase tracking-widest">Enterprise Plan</div>
               </div>
            </div>

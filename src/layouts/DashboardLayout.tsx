@@ -41,7 +41,7 @@ export const DashboardLayout = ({ children, isOffline, onLogout }: DashboardLayo
           >
             <span className="material-symbols-outlined text-2xl">menu</span>
           </button>
-          <span className="md:hidden font-headline italic text-xl text-primary font-bold tracking-tighter">AgriNova AI</span>
+          <span className="md:hidden font-headline italic text-xl text-primary font-bold tracking-tighter">HappyCrops AI</span>
 
           {/* Online badge — desktop only */}
           <div className="hidden md:flex items-center gap-2 ml-4 px-3 py-1 bg-surface-container-lowest rounded-full border border-outline-variant/15">
@@ -80,10 +80,10 @@ export const DashboardLayout = ({ children, isOffline, onLogout }: DashboardLayo
             <div className="px-6 flex items-center justify-between mb-2">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center border border-outline-variant/15 overflow-hidden">
-                  <img alt="AgriNova" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVltvsmDoV3tZLLyVyhcNXyIN7tDNAW_v1ODAVK5ubsPO0R_EaqpaNr3ghWRZ7VLSXAdqRc_qa37yM_6vqHZAjaEMMWgYpmz7BNZ-EAQKblKk37PnxjA3tzIkHCi9MyxaRUWa1Zcy2wcZoo6Bs973loIxGoGC10r08UzjTAizJ5TaSWM07d-HkcxlH5esQMt_RbYlTv6v50E77SjwW_G1u_vQ8gtUNC6-ZDfpPk16wvCCEZYpY97lT5_r-6Z6DO-wour7gaxpf8zVt" />
+                  <img alt="HappyCrops AI" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVltvsmDoV3tZLLyVyhcNXyIN7tDNAW_v1ODAVK5ubsPO0R_EaqpaNr3ghWRZ7VLSXAdqRc_qa37yM_6vqHZAjaEMMWgYpmz7BNZ-EAQKblKk37PnxjA3tzIkHCi9MyxaRUWa1Zcy2wcZoo6Bs973loIxGoGC10r08UzjTAizJ5TaSWM07d-HkcxlH5esQMt_RbYlTv6v50E77SjwW_G1u_vQ8gtUNC6-ZDfpPk16wvCCEZYpY97lT5_r-6Z6DO-wour7gaxpf8zVt" />
                 </div>
                 <div>
-                  <span className="font-headline text-lg font-bold text-primary italic leading-tight block">AgriNova AI</span>
+                  <span className="font-headline text-lg font-bold text-primary italic leading-tight block">HappyCrops AI</span>
                   <span className="text-[10px] text-on-surface-variant font-label uppercase tracking-widest">Digital Crop Expert</span>
                 </div>
               </div>
@@ -135,7 +135,7 @@ export const DashboardLayout = ({ children, isOffline, onLogout }: DashboardLayo
               <img alt="User profile" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVltvsmDoV3tZLLyVyhcNXyIN7tDNAW_v1ODAVK5ubsPO0R_EaqpaNr3ghWRZ7VLSXAdqRc_qa37yM_6vqHZAjaEMMWgYpmz7BNZ-EAQKblKk37PnxjA3tzIkHCi9MyxaRUWa1Zcy2wcZoo6Bs973loIxGoGC10r08UzjTAizJ5TaSWM07d-HkcxlH5esQMt_RbYlTv6v50E77SjwW_G1u_vQ8gtUNC6-ZDfpPk16wvCCEZYpY97lT5_r-6Z6DO-wour7gaxpf8zVt"/>
             </div>
             <div className="flex flex-col">
-              <span className="font-headline text-xl font-bold text-primary italic leading-tight">AgriNova AI</span>
+              <span className="font-headline text-xl font-bold text-primary italic leading-tight">HappyCrops AI</span>
               <span className="text-xs text-on-surface-variant font-label uppercase tracking-widest mt-1">Digital Crop Expert</span>
             </div>
           </div>

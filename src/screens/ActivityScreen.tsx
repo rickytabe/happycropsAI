@@ -58,7 +58,7 @@ export const ActivityScreen = ({ history, deleteHistory }: { history: AnalysisRe
             </div>
             <div>
               <div className="text-sm text-on-surface-variant font-bold mb-1">Session Start</div>
-              <h3 className="text-xl font-bold text-white mb-2">AgriNova System Initialized</h3>
+              <h3 className="text-xl font-bold text-white mb-2">HappyCrops AI Initialized</h3>
               <p className="text-on-surface-variant">Neural diagnostics engine and regional specialized models loaded.</p>
             </div>
           </div>

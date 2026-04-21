@@ -3,9 +3,10 @@
  * Manages user authentication state in localStorage.
  * Designed to be swapped out for a real backend/BaaS (Supabase, Firebase, etc.)
  * with minimal changes — just replace the localStorage calls with API calls.
+ * Product: HappyCrops AI (happycropsai.com)
  */
 
-const SESSION_KEY = 'agrinova_session';
+const SESSION_KEY = 'happycrops_session';
 
 export interface UserSession {
   id: string;

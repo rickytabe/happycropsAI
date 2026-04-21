@@ -26,7 +26,7 @@ export const AuthScreen = ({ onLogin }: { onLogin: () => void }) => {
       <MeshBackground />
       <div className="absolute top-6 left-6 md:top-10 md:left-10 z-20">
         <span className="text-2xl font-extrabold tracking-tighter text-white">
-          🌱 Agri<span className="text-primary">Nova</span> AI
+          🌱 Happy<span className="text-primary">Crops</span> AI
         </span>
       </div>
 

@@ -19,7 +19,7 @@ export default function App() {
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
 
   useEffect(() => {
-    const saved = localStorage.getItem('agrinova_history');
+    const saved = localStorage.getItem('happycrops_history');
     if (saved) {
       try {
         setHistory(JSON.parse(saved));
@@ -40,13 +40,13 @@ export default function App() {
   const addHistory = (result: AnalysisResult) => {
     const newHistory = [result, ...history].slice(0, 20); // Keep last 20
     setHistory(newHistory);
-    localStorage.setItem('agrinova_history', JSON.stringify(newHistory));
+    localStorage.setItem('happycrops_history', JSON.stringify(newHistory));
   };
 
   const deleteHistory = (timestamp: number) => {
     const newHistory = history.filter(h => h.timestamp !== timestamp);
     setHistory(newHistory);
-    localStorage.setItem('agrinova_history', JSON.stringify(newHistory));
+    localStorage.setItem('happycrops_history', JSON.stringify(newHistory));
   };
 
   return (
