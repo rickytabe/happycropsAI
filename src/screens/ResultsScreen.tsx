@@ -80,32 +80,23 @@ export const ResultsScreen = ({ history, deleteHistory }: ResultsScreenProps) =>
 
   // ── PDF Export via Print ───────────────────────────────────────────
   const handleDownloadPDF = () => {
-    const desktopEl = document.getElementById('pdf-desktop-view');
-    const mobileEl  = document.getElementById('pdf-mobile-view');
+    // We'll use a class on the body to trigger the print-only CSS overrides
+    document.body.classList.add('is-printing-report');
 
-    if (!desktopEl || !mobileEl) {
-      window.print();
-      return;
-    }
-
-    // Force desktop layout visible regardless of current viewport
-    const prevDesktop = desktopEl.style.display;
-    const prevMobile  = mobileEl.style.display;
-    desktopEl.style.display = 'block';
-    mobileEl.style.display  = 'none';
-
-    // Restore after print dialog closes
     const restore = () => {
-      desktopEl.style.display = prevDesktop;
-      mobileEl.style.display  = prevMobile;
+      document.body.classList.remove('is-printing-report');
       window.removeEventListener('afterprint', restore);
     };
+
     window.addEventListener('afterprint', restore);
 
-    // Small delay to allow browser to reflow layout to desktop
+    // Small delay to allow browser to reflow layout to desktop based on the new class
     setTimeout(() => {
       window.print();
-    }, 150);
+      
+      // Secondary fallback for mobile browsers that don't trigger afterprint
+      setTimeout(restore, 500);
+    }, 250);
   };
 
   return (

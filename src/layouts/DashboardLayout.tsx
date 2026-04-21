@@ -1,6 +1,7 @@
 import { ReactNode, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '../lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -12,6 +13,19 @@ export const DashboardLayout = ({ children, isOffline, onLogout }: DashboardLayo
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+
+  const notifications = [
+    { id: 1, title: "High Humidity Alert", msg: "West Africa region is experiencing 85% humidity. Increased fungal risk.", time: "2m ago", type: "warning" },
+    { id: 2, title: "New Analysis Ready", msg: "Cacao sample #1288 analysis completed successfully.", time: "1h ago", type: "success" },
+    { id: 3, title: "System Update", msg: "Agronomy AI model updated to v2.4 (Improved Pest Detection).", time: "4h ago", type: "info" },
+  ];
+
+  const handleLogout = () => {
+    if (window.confirm("Are you sure you want to log out?")) {
+      onLogout();
+    }
+  };
 
   const navItems = [
     { name: "Intelligence", icon: "analytics", path: "/dashboard", end: true },
@@ -28,7 +42,7 @@ export const DashboardLayout = ({ children, isOffline, onLogout }: DashboardLayo
         : location.pathname.startsWith(item.path);
 
   return (
-    <div className="bg-background text-on-surface font-body min-h-screen selection:bg-primary/30 selection:text-primary">
+    <div className="bg-background text-on-surface font-body min-h-screen selection:bg-primary/30 selection:text-primary overflow-x-hidden">
 
       {/* ── Top App Bar ─────────────────────────────────────────── */}
       <header className="fixed top-0 right-0 w-full md:w-[calc(100%-16rem)] z-30 bg-background/50 md:bg-transparent backdrop-blur-md md:backdrop-blur-lg flex justify-between items-center px-4 md:px-10 h-16 md:h-20 border-b border-white/5 md:border-none transition-all">
@@ -41,10 +55,10 @@ export const DashboardLayout = ({ children, isOffline, onLogout }: DashboardLayo
           >
             <span className="material-symbols-outlined text-2xl">menu</span>
           </button>
-          <span className="md:hidden font-headline italic text-xl text-primary font-bold tracking-tighter">HappyCrops AI</span>
+          <span className="md:hidden font-headline italic text-xl text-primary font-bold tracking-tighter uppercase tracking-widest">AgriNova</span>
 
           {/* Online badge — desktop only */}
-          <div className="hidden md:flex items-center gap-2 ml-4 px-3 py-1 bg-surface-container-lowest rounded-full border border-outline-variant/15">
+          <div className="hidden md:flex items-center gap-2 ml-4 px-3 py-1 bg-surface-container-lowest rounded-full border border-online-variant/15">
             <span className={cn("w-2 h-2 rounded-full animate-pulse", isOffline ? "bg-amber-500" : "bg-primary")}></span>
             <span className={cn("text-xs font-label uppercase tracking-widest", isOffline ? "text-amber-500" : "text-on-surface-variant")}>
               {isOffline ? "Offline Mode" : "Live AI Network Active"}
@@ -53,10 +67,14 @@ export const DashboardLayout = ({ children, isOffline, onLogout }: DashboardLayo
         </div>
 
         <div className="flex items-center gap-4 md:gap-6">
-          <button className="text-slate-300 hover:text-primary transition-colors">
+          <button 
+            onClick={() => setNotificationsOpen(true)}
+            className="text-slate-300 hover:text-primary transition-colors relative"
+          >
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>notifications</span>
+            <span className="absolute top-0 right-0 w-2 h-2 bg-primary rounded-full border-2 border-[#0c1512]"></span>
           </button>
-          <button onClick={onLogout} title="Log Out" className="text-slate-300 hover:text-red-400 transition-colors">
+          <button onClick={handleLogout} title="Log Out" className="text-slate-300 hover:text-red-400 transition-colors">
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>logout</span>
           </button>
         </div>
@@ -168,6 +186,75 @@ export const DashboardLayout = ({ children, isOffline, onLogout }: DashboardLayo
           </button>
         </div>
       </nav>
+
+      {/* ── Notifications Drawer ───────────────────────────────── */}
+      <AnimatePresence>
+        {notificationsOpen && (
+          <div className="fixed inset-0 z-[100] flex justify-end">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm" 
+              onClick={() => setNotificationsOpen(false)} 
+            />
+            <motion.aside 
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="relative w-full max-w-sm h-full bg-surface-container shadow-2xl border-l border-white/5 overflow-hidden flex flex-col"
+            >
+              <div className="p-6 border-b border-white/5 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary text-xl">notifications</span>
+                  <h3 className="font-headline text-xl font-bold text-white">Notifications</h3>
+                </div>
+                <button 
+                  onClick={() => setNotificationsOpen(false)}
+                  className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-white/5 transition-colors text-slate-400"
+                >
+                  <span className="material-symbols-outlined">close</span>
+                </button>
+              </div>
+              
+              <div className="flex-grow overflow-y-auto custom-scrollbar p-0">
+                {notifications.length > 0 ? (
+                  <div className="flex flex-col">
+                    {notifications.map((n) => (
+                      <div key={n.id} className="p-5 border-b border-white/5 hover:bg-white/5 transition-colors group cursor-pointer">
+                        <div className="flex justify-between items-start mb-1">
+                          <span className={cn(
+                            "text-[10px] uppercase tracking-widest font-bold px-2 py-0.5 rounded",
+                            n.type === 'warning' ? "bg-amber-500/20 text-amber-500" : 
+                            n.type === 'success' ? "bg-primary/20 text-primary" : "bg-blue-500/20 text-blue-400"
+                          )}>
+                            {n.type}
+                          </span>
+                          <span className="text-[10px] text-on-surface-variant uppercase tracking-widest">{n.time}</span>
+                        </div>
+                        <h4 className="text-white font-bold mb-1 group-hover:text-primary transition-colors">{n.title}</h4>
+                        <p className="text-on-surface-variant text-sm leading-relaxed">{n.msg}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-full text-center p-10 opacity-40">
+                     <span className="material-symbols-outlined text-6xl mb-4">notifications_off</span>
+                     <p className="text-sm">No new notifications</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="p-6 bg-white/5 border-t border-white/5">
+                 <button className="w-full py-3 rounded-full border border-white/10 text-xs uppercase tracking-widest font-bold hover:bg-white/10 transition-colors">
+                    Clear All
+                 </button>
+              </div>
+            </motion.aside>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* ── Main Content ─────────────────────────────────────────── */}
       <main className="md:ml-64 pt-16 md:pt-20 pb-8 md:pb-20 min-h-screen relative">
