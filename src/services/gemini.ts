@@ -113,41 +113,8 @@ export async function analyzeCropImage(base64Image: string, country: Country): P
     } as AnalysisResult;
   } catch (error: any) {
     console.error("AI Analysis failed:", error);
-    if (error?.message === "NOT_A_PLANT") throw error; // Re-throw to be caught by UI
-    // Fallback mock for demo if API fails
-    return {
-      status: "diseased",
-      disease_name: "Late Blight",
-      confidence_score: 0.95,
-      risk_level: "high",
-      country: country,
-      contextual_insight: "Our AI analysis has identified active Late Blight in your potato crops. Immediate action is required to prevent widespread infection.",
-      image_analysis: {
-        photo_id: "#1",
-        description: "Typical lesions showing dark, water-soaked appearance with faint white mold on the leaf underside."
-      },
-      untreated_impact: {
-        value_lost: "Up to 80%",
-        description: "Without treatment, this pathogen can destroy your entire harvest within 7-10 days under current weather conditions.",
-        risk_label: "Severe risk detected",
-        risk_percentage: 80
-      },
-      spread_factors: [
-        { icon_name: "rainy", title: "Rain & Wind", description: "Spores travel easily through moisture and breeze to nearby plants." },
-        { icon_name: "thermometer", title: "Cool & Damp", description: "Thrives in the current 60°F-75°F temperature window." }
-      ],
-      treatment_steps: [
-        { title: "Apply Fungicide", description: "Spray a commercial fungicide like Ridomil Gold (Metalaxyl) or Dithane M-45 (Mancozeb) immediately to protect healthy leaves." },
-        { title: "Remove Infected Plants", description: "Pull up and bag heavily damaged plants. Do not compost them." }
-      ],
-      preventive_measures: [
-        "Increase spacing between rows",
-        "Avoid evening watering",
-        "Use resistant crop varieties"
-      ],
-      timestamp: Date.now(),
-      imageUrl: base64Image
-    };
+    // Re-throw all errors so the UI can handle them (show error message or navigate correctly)
+    throw error;
   }
 }
 

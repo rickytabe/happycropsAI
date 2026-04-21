@@ -32,8 +32,8 @@ export const ScanningLoader = ({ image }: ScanningLoaderProps) => {
           alt="Scanning" 
           className="w-full h-full object-cover grayscale-[0.3]"
         />
-        <div className="absolute inset-x-0 h-0.5 bg-editorial-emerald shadow-[0_0_15px_#10b981] z-10 animate-scan" />
-        <div className="absolute inset-0 bg-editorial-emerald/5 pointer-events-none" />
+        <div className="absolute inset-x-0 h-1 bg-primary shadow-[0_0_20px_4px_rgba(166,215,0,0.8),0_0_40px_8px_rgba(166,215,0,0.4)] z-10 animate-scan" />
+        <div className="absolute inset-0 bg-primary/10 pointer-events-none" />
       </div>
 
       <div className="flex flex-col items-center space-y-4">

@@ -147,9 +147,9 @@ export const DesktopDashboard = ({ result }: DesktopDashboardProps) => {
       {/* Bento Grid Diagnostic Canvas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Big Clear Image Card */}
-        <div className="lg:col-span-2 lg:row-span-2 relative overflow-hidden rounded-xl bg-white/5 border border-white/10 group">
+        <div className="lg:col-span-2 lg:row-span-2 relative overflow-hidden rounded-xl bg-white/5 border border-white/10 group min-h-[500px]">
           {result.imageUrl && (
-             <img className="w-full h-full object-cover min-h-[400px] opacity-80 group-hover:opacity-100 transition-opacity duration-700 absolute" src={result.imageUrl} alt="Analysis Result"/>
+             <img className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700 absolute inset-0" src={result.imageUrl} alt="Analysis Result"/>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
           <div className="absolute bottom-8 left-8 right-8 text-white z-10">

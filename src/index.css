@@ -87,3 +87,81 @@
 .animate-scan {
   animation: scan-line 3s linear infinite;
 }
+
+/* ── Notifications / Drawer Animations ───────────────────────────────── */
+@keyframes slide-in-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s cubic-bezier(0.165, 0.84, 0.44, 1.0);
+}
+
+/* ── Print / PDF Export ──────────────────────────────────────────────── */
+@media print {
+  /* Wide landscape page */
+  @page {
+    size: A3 landscape;
+    margin: 12mm 14mm;
+  }
+
+  /* Hide app-shell elements */
+  nav, aside, footer, [data-print="hide"] {
+    display: none !important;
+  }
+
+  html, body, #root {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* 
+ * Robust desktop-forcing for Print Export
+ * Only active when the .is-printing-report class is on the body
+ * AND typically used within the @media print context OR the print-preview.
+ */
+.is-printing-report #pdf-mobile-view {
+  display: none !important;
+}
+
+.is-printing-report #pdf-desktop-view {
+  display: block !important;
+  width: 100% !important;
+}
+
+.is-printing-report #pdf-desktop-view header {
+  display: grid !important;
+  grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+  gap: 2rem !important;
+}
+
+.is-printing-report #pdf-desktop-view header > div:first-child { 
+  grid-column: span 8 / span 8 !important; 
+}
+.is-printing-report #pdf-desktop-view header > div:last-child { 
+  grid-column: span 4 / span 4 !important; 
+}
+
+.is-printing-report #pdf-desktop-view .grid.grid-cols-1.md\:grid-cols-2.lg\:grid-cols-3 {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 1.5rem !important;
+}
+
+.is-printing-report .lg\:col-span-2 { grid-column: span 2 / span 2 !important; }
+.is-printing-report .lg\:row-span-2 { grid-row: span 2 / span 2 !important; }
+.is-printing-report .lg\:col-span-2.lg\:row-span-2 { min-height: 500px !important; }
+
+.is-printing-report .grid.grid-cols-1.md\:grid-cols-2.gap-10 {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+.is-printing-report .bg-white\/5 { background-color: rgba(255, 255, 255, 0.05) !important; }
+.is-printing-report .bg-primary\/5 { background-color: rgba(166, 215, 0, 0.05) !important; }
